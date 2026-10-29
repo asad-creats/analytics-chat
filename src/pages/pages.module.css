@@ -16,6 +16,17 @@
   gap: 24px;
 }
 
+.thread {
+  gap: 32px;
+}
+
+.turn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-margin-top: 16px;
+}
+
 .asked {
   display: flex;
   flex-direction: column;
@@ -69,6 +80,10 @@
 
   .composer {
     margin-top: auto;
+  }
+
+  .thread {
+    gap: 24px;
   }
 
   /* Follow-up chips scroll sideways rather than wrapping into a wall. */

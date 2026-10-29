@@ -1,7 +1,9 @@
 import { useId, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { dataset, teamScopes } from '../data/demo';
+import { useSettings } from '../state/settings';
 import { Icon } from './Icon';
 import styles from './Composer.module.css';
+
+const WHOLE_TEAM = 'Whole team';
 
 interface ComposerProps {
   /** "hero" is the home-page box; "inline" is the follow-up bar under answers. */
@@ -28,13 +30,15 @@ export function Composer({
 }: ComposerProps) {
   const id = useId();
   const [value, setValue] = useState('');
-  const [scope, setScope] = useState(teamScopes[0]);
+  const [scope, setScope] = useState(WHOLE_TEAM);
+  const { status } = useSettings();
+  const scopes = [WHOLE_TEAM, ...(status?.agents ?? [])];
 
   const submit = (event?: FormEvent) => {
     event?.preventDefault();
     const question = value.trim();
     if (!question || busy) return;
-    onSubmit(question);
+    onSubmit(scope === WHOLE_TEAM ? question : `${question} (only ${scope}'s leads)`);
     setValue('');
   };
 
@@ -73,7 +77,7 @@ export function Composer({
             <label className={styles.scope}>
               <span className="visually-hidden">Whose data</span>
               <select value={scope} onChange={(event) => setScope(event.target.value)}>
-                {teamScopes.map((option) => (
+                {scopes.map((option) => (
                   <option key={option}>{option}</option>
                 ))}
               </select>
@@ -86,7 +90,9 @@ export function Composer({
         <div className={styles.freshness}>
           <Icon name="clock" />
           <span>
-            Data as of {dataset.asOf} today · {dataset.leadCount} leads · refreshes daily
+            {status
+              ? `Live CRM data · ${status.lead_count.toLocaleString()} leads · updates every 15 minutes`
+              : 'Answers come from live CRM data'}
           </span>
         </div>
       </form>

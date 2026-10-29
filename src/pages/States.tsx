@@ -6,14 +6,18 @@ import {
   LoadingAnswer,
   NoResults,
 } from '../components/AnswerStates';
-import { DemoBadge } from '../components/controls';
-import { dataset } from '../data/demo';
+import { useNavigate } from 'react-router-dom';
+import { Button, DemoBadge } from '../components/controls';
+import { useConversations } from '../state/conversations';
 import { useToast } from '../state/toast';
 import styles from './States.module.css';
 
-/** Reference page for every answer state, as laid out in the design. */
+/** Reference page for every answer state, as laid out in the design. Its choices ask for real. */
 export function States() {
   const toast = useToast();
+  const navigate = useNavigate();
+  const { start } = useConversations();
+  const ask = (question: string) => navigate(`/c/${start(question)}`);
 
   return (
     <>
@@ -39,7 +43,7 @@ export function States() {
               question="Which agents set the most appointments in October?"
               steps={[
                 { label: 'Understood: appointments set, Oct 1–28, grouped by agent', status: 'done' },
-                { label: `Reading ${dataset.leadCount} leads…`, status: 'active' },
+                { label: 'Reading 412 leads…', status: 'active' },
                 { label: 'Drawing the chart', status: 'pending' },
               ]}
               onStop={() => toast.show('Stopped. Your question is still in the box.')}
@@ -54,11 +58,11 @@ export function States() {
               question="How are we doing this month?"
               prompt="“Doing” could mean a few things. Which number should I use?"
               options={[
-                { label: 'Deals closed', unit: 'count', to: '/board#deals-closing' },
-                { label: 'New leads', unit: 'count', to: '/board#new-leads' },
-                { label: 'Response time', unit: 'minutes', to: '/thread/monday#response-slip' },
-                { label: 'All four, side by side', unit: 'summary', to: '/board' },
+                { label: 'How many deals closed this month?', unit: 'count' },
+                { label: 'How many new leads came in this month?', unit: 'count' },
+                { label: 'What was our median response time this month?', unit: 'minutes' },
               ]}
+              onChoose={ask}
             />
           </section>
 
@@ -71,7 +75,7 @@ export function States() {
               explanation="No deal over $900,000 closed in October. 4 deals closed; the largest was $612,000."
               filters={[{ label: 'Closed: Oct 1–28' }, { label: 'Price > $900,000', changed: true }]}
               suggestions={['Show all 4 October closings', 'Try $500K+']}
-              onSuggestion={(q) => toast.show(`“${q}” isn’t in this demo yet.`)}
+              onSuggestion={ask}
             />
           </section>
 
@@ -83,9 +87,12 @@ export function States() {
               question="Which leads replied to a text today?"
               title="I couldn’t reach your CRM"
               detail="This question needs today’s text activity, and the connection timed out. I didn’t guess an answer."
-              reference="PL-4821"
-              onRetry={() => toast.show('Still can’t reach your CRM. Try again in a minute.')}
-              onFallback={() => toast.show('Using 7:00 AM data.')}
+              footer="Nothing was guessed. Your question is saved."
+              actions={
+                <Button variant="primary" size="lg" onClick={() => toast.show('This is the reference layout; nothing failed.')}>
+                  Try again
+                </Button>
+              }
             />
           </section>
 
@@ -96,7 +103,8 @@ export function States() {
             <CantAnswer
               question="Which agent is most likely to quit?"
               explanation="I can’t answer that from your CRM. It records leads, calls, appointments and deals, not how agents feel about their work."
-              related={{ question: 'Whose call activity dropped most in the last 30 days?', to: '/board' }}
+              related={['Whose call activity dropped most in the last 30 days?']}
+              onAsk={ask}
             />
           </section>
         </div>

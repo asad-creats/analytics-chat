@@ -1,32 +1,31 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { usePins, type PinId } from '../state/pins';
 import { PinButton } from './controls';
 import { Icon } from './Icon';
 import styles from './BoardCard.module.css';
 
 interface BoardCardProps {
-  pinId: PinId;
+  id: string;
   title: string;
   figure: string;
   context: string;
-  /** Answer page that holds the full method. */
+  /** The conversation the answer came from. */
   to?: string;
-  /** Footer note; defaults to the last refresh time. */
+  /** Footer note, e.g. when it was last refreshed. */
   note?: string;
   /** Today's refresh failed: show the last good run and offer a retry. */
   stale?: { message: string; onRetry: () => void };
+  onUnpin: () => void;
   children: ReactNode;
 }
 
-export function BoardCard({ pinId, title, figure, context, to, note = 'Updated 7:00 AM', stale, children }: BoardCardProps) {
-  const pins = usePins();
+export function BoardCard({ id, title, figure, context, to, note, stale, onUnpin, children }: BoardCardProps) {
   return (
-    <article id={pinId} className={`${styles.card} answer-in`}>
+    <article id={id} className={`${styles.card} answer-in`}>
       <div className={styles.body}>
         <div className={styles.head}>
           <h2 className={styles.title}>{title}</h2>
-          <PinButton variant="icon" pinned={pins.isPinned(pinId)} onToggle={() => pins.toggle(pinId)} />
+          <PinButton variant="icon" pinned onToggle={onUnpin} />
         </div>
         <div className={styles.headline}>
           {to ? (
@@ -55,7 +54,7 @@ export function BoardCard({ pinId, title, figure, context, to, note = 'Updated 7
           <span>{note}</span>
           {to && (
             <Link to={to} className={styles.methodLink}>
-              How I got this
+              Open answer
             </Link>
           )}
         </div>

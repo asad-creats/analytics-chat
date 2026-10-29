@@ -113,8 +113,49 @@
   text-overflow: ellipsis;
 }
 
-.user {
+.empty {
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.footer {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aiButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--raised);
+  color: var(--text);
+  text-align: left;
+}
+
+.aiButton:hover {
+  border-color: var(--border-control);
+}
+
+.aiText {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+
+.aiMode {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+.user {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -206,13 +247,16 @@
   .mobileActions {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 0;
+    margin-right: -12px;
   }
 
   .mobileIcon {
     width: 44px;
     height: 44px;
-    margin-right: -12px;
+    padding: 0;
+    border: 0;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;

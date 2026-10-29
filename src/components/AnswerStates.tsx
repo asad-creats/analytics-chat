@@ -65,7 +65,7 @@ export function LoadingAnswer({ question, steps, onStop }: LoadingAnswerProps) {
         ))}
       </div>
       <div className={styles.footer}>
-        <span>Usually 2–5 seconds.</span>
+        <span>Usually 5–15 seconds.</span>
         {onStop && (
           <Button size="md" variant="ghost" onClick={onStop}>
             Stop
@@ -78,28 +78,24 @@ export function LoadingAnswer({ question, steps, onStop }: LoadingAnswerProps) {
 
 /* ---------- Ambiguous ---------- */
 
-export interface Interpretation {
-  label: string;
-  unit: string;
-  to: string;
-}
-
 interface AmbiguousAnswerProps {
   question: string;
   prompt: ReactNode;
-  options: Interpretation[];
+  /** Each option is a full question the person might have meant. */
+  options: { label: string; unit?: string }[];
+  onChoose: (option: string) => void;
 }
 
-export function AmbiguousAnswer({ question, prompt, options }: AmbiguousAnswerProps) {
+export function AmbiguousAnswer({ question, prompt, options, onChoose }: AmbiguousAnswerProps) {
   return (
     <StateCard question={question}>
       <p className={styles.lead}>{prompt}</p>
       <div className={styles.options}>
         {options.map((option) => (
-          <Link key={option.label} to={option.to} className={styles.option}>
+          <button key={option.label} type="button" className={styles.option} onClick={() => onChoose(option.label)}>
             {option.label}
-            <span className={styles.optionUnit}>{option.unit}</span>
-          </Link>
+            {option.unit && <span className={styles.optionUnit}>{option.unit}</span>}
+          </button>
         ))}
       </div>
       <span className={styles.footer}>Or rephrase in the box below.</span>
@@ -149,24 +145,17 @@ interface ErrorAnswerProps {
   question: string;
   title: string;
   detail: string;
-  reference?: string;
-  onRetry?: () => void;
-  onFallback?: () => void;
+  /** Buttons that recover: try again, add your own key… */
+  actions?: ReactNode;
+  footer?: string;
 }
 
-export function ErrorAnswer({ question, title, detail, reference, onRetry, onFallback }: ErrorAnswerProps) {
+export function ErrorAnswer({ question, title, detail, actions, footer }: ErrorAnswerProps) {
   return (
     <StateCard question={question} role="alert">
       <ErrorNotice title={title} detail={detail} />
-      <div className={styles.chips}>
-        <Button variant="primary" size="lg" onClick={onRetry}>
-          Try again
-        </Button>
-        <Button variant="secondary" size="lg" onClick={onFallback}>
-          Use 7:00 AM data instead
-        </Button>
-      </div>
-      {reference && <span className={styles.footer}>Your question is saved. Reference {reference}.</span>}
+      {actions && <div className={styles.chips}>{actions}</div>}
+      {footer && <span className={styles.footer}>{footer}</span>}
     </StateCard>
   );
 }
@@ -187,27 +176,34 @@ export function ErrorNotice({ title, detail }: { title: string; detail: string }
 
 interface CantAnswerProps {
   question: string;
-  explanation: string;
-  related?: { question: string; to: string };
+  explanation: ReactNode;
+  /** Related questions the data can answer. */
+  related?: string[];
+  onAsk: (question: string) => void;
 }
 
-export function CantAnswer({ question, explanation, related }: CantAnswerProps) {
+export function CantAnswer({ question, explanation, related = [], onAsk }: CantAnswerProps) {
   return (
     <StateCard question={question}>
       <p className={styles.lead}>{explanation}</p>
-      {related && (
+      {related.length > 0 && (
         <div className={styles.block}>
-          <span className={styles.label}>A related question I can answer</span>
-          <Link to={related.to} className={styles.related}>
-            {related.question}
-            <Icon name="arrowRight" className={styles.accent} />
-          </Link>
+          <span className={styles.label}>
+            {related.length === 1 ? 'A related question I can answer' : 'Related questions I can answer'}
+          </span>
+          {related.map((q) => (
+            <button key={q} type="button" className={styles.related} onClick={() => onAsk(q)}>
+              {q}
+              <Icon name="arrowRight" className={styles.accent} />
+            </button>
+          ))}
         </div>
       )}
       <details className={styles.footer}>
         <summary className={styles.footerLink}>What data can Pipeline see?</summary>
         <p className={styles.dataScope}>
-          Leads, calls, texts, emails, appointments and deals from your CRM, refreshed daily at 7:00 AM.
+          Your team’s leads, calls, texts, emails, notes, appointments and deals from the CRM. Not market data, and
+          not anything people didn’t log.
         </p>
       </details>
     </StateCard>
@@ -221,7 +217,7 @@ export function EmptyBoard() {
     <div className={styles.empty}>
       <Icon name="pin" size={24} />
       <strong className={styles.emptyTitle}>Nothing pinned yet</strong>
-      <span className={styles.emptyText}>Pin any answer and it lands here, re-run every morning at 7:00 AM.</span>
+      <span className={styles.emptyText}>Pin any answer and it lands here. Refresh the board to re-run them on the latest data.</span>
       <Link to="/" className={styles.emptyAction}>
         Ask a question
       </Link>

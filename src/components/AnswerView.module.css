@@ -1,0 +1,10 @@
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tableTitle {
+  font-size: 14px;
+  font-weight: 600;
+}

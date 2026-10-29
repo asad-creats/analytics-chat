@@ -1,0 +1,4 @@
+# Pipeline's Edge Function is a public demo endpoint: visitors aren't signed in,
+# and the function enforces its own per-visitor and per-day limits.
+[functions.pipeline-ask]
+verify_jwt = false

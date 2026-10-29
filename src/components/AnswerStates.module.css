@@ -158,12 +158,20 @@ details.footer {
   gap: 8px;
 }
 
+.option,
+.related {
+  width: 100%;
+  font-size: 14px;
+  text-align: left;
+}
+
 .option {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 44px;
-  padding: 0 16px;
+  min-height: 44px;
+  padding: 10px 16px;
+  gap: 12px;
   border-radius: var(--radius-control);
   border: 1px solid var(--border-control);
   background: var(--raised);

@@ -163,9 +163,10 @@ interface LineChartProps {
   labelled?: number[];
 }
 
+// x0..x1 is where the first and last points sit; points spread evenly between.
 const layouts = {
-  full: { width: 720, height: 240, x0: 64, step: 130, top: 20, base: 200, r: 3.5 },
-  mini: { width: 320, height: 112, x0: 24, step: 68, top: 0, base: 88, r: 3 },
+  full: { width: 720, height: 240, x0: 64, x1: 584, top: 20, base: 200, r: 3.5 },
+  mini: { width: 320, height: 112, x0: 24, x1: 296, top: 0, base: 88, r: 3 },
 };
 
 export function LineChart({
@@ -181,7 +182,8 @@ export function LineChart({
   labelled = [],
 }: LineChartProps) {
   const l = layouts[variant];
-  const x = (i: number) => l.x0 + i * l.step;
+  const step = categories.length > 1 ? (l.x1 - l.x0) / (categories.length - 1) : 0;
+  const x = (i: number) => l.x0 + i * step;
   const y = (v: number) => l.base - (v / domainMax) * (l.base - l.top);
   const plotEnd = variant === 'full' ? 600 : l.width - 8;
   const last = categories.length - 1;

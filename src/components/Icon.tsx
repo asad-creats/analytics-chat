@@ -88,6 +88,17 @@ const icons = {
   },
   check: { box: 16, stroke: 1.75, body: <path d="M3.5 8.5l3 3 6-7" /> },
   pending: { box: 16, stroke: 1.5, body: <circle cx="8" cy="8" r="5.5" /> },
+  sliders: {
+    box: 16,
+    stroke: 1.5,
+    body: (
+      <>
+        <path d="M2.5 4.5h6M11.5 4.5h2M2.5 11.5h2M7.5 11.5h6" />
+        <circle cx="10" cy="4.5" r="1.5" />
+        <circle cx="6" cy="11.5" r="1.5" />
+      </>
+    ),
+  },
   mic: {
     box: 18,
     stroke: 1.5,

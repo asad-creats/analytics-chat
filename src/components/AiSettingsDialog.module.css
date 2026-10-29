@@ -1,0 +1,122 @@
+.dialog {
+  width: min(480px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  color: var(--text);
+  box-shadow: var(--shadow-float);
+}
+
+.dialog::backdrop {
+  background: rgba(14, 15, 17, 0.4);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.title {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.modes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mode {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.mode input {
+  margin-top: 3px;
+  accent-color: var(--accent);
+}
+
+.modeOn {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.modeText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modeText strong {
+  font-weight: 600;
+}
+
+.modeText span {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.field input,
+.field select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-control);
+  background: var(--raised);
+  color: var(--text);
+}
+
+.field input:focus-visible,
+.field select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.hint {
+  align-self: flex-start;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.privacy {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-3);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

@@ -56,17 +56,8 @@
   flex: 1;
 }
 
-.date {
-  color: var(--text-3);
-}
-
-.status {
+.summary {
   color: var(--text-2);
-}
-
-.urgent {
-  color: var(--warn);
-  font-weight: 600;
 }
 
 @media (max-width: 760px) {

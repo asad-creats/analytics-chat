@@ -1,12 +1,15 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { isConnected } from '../api/pipeline';
 import { TopBar } from '../components/AppShell';
 import { Composer } from '../components/Composer';
-import { suggestionGroups } from '../data/demo';
-import { askPath } from '../routes';
+import { starterGroups } from '../data/starters';
+import { useConversations } from '../state/conversations';
 import styles from './Home.module.css';
 
 export function Home() {
   const navigate = useNavigate();
+  const { start } = useConversations();
+  const ask = (question: string) => navigate(`/c/${start(question)}`);
 
   return (
     <>
@@ -16,15 +19,23 @@ export function Home() {
           <div className={styles.intro}>
             <h1 className={styles.title}>What do you want to know?</h1>
             <p className={styles.lede}>
-              Ask about your leads, agents or deals in plain English. Every answer shows the numbers it used.
+              Ask about your leads, agents or deals in plain English. Answers are worked out from the live CRM data
+              every time you ask.
             </p>
           </div>
+
+          {!isConnected && (
+            <p className={styles.notice}>
+              Live data isn’t connected in this build yet. Set <code>VITE_SUPABASE_URL</code> and{' '}
+              <code>VITE_SUPABASE_ANON_KEY</code>; the README has the steps.
+            </p>
+          )}
 
           <Composer
             variant="hero"
             label="Your question"
             placeholder="e.g. Which agents set the most appointments this month?"
-            onSubmit={(question) => navigate(askPath(question))}
+            onSubmit={ask}
             autoFocus
           />
 
@@ -33,16 +44,16 @@ export function Home() {
               Try one of these
             </h2>
             <div className={styles.groups}>
-              {suggestionGroups.map((group) => (
+              {starterGroups.map((group) => (
                 <div key={group.topic} className={styles.group}>
                   <div className={styles.topic}>
                     <span aria-hidden="true" className={styles.topicMark} />
                     {group.topic}
                   </div>
-                  {group.items.map((item) => (
-                    <Link key={item.question} to={item.to} className={styles.starter}>
-                      {item.question}
-                    </Link>
+                  {group.questions.map((question) => (
+                    <button key={question} type="button" className={styles.starter} onClick={() => ask(question)}>
+                      {question}
+                    </button>
                   ))}
                 </div>
               ))}
