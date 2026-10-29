@@ -1,0 +1,143 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+  scroll-margin-top: 24px;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.figure {
+  color: var(--text);
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: underline dotted var(--text-3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+
+a.figure:hover,
+a.figure:focus-visible {
+  color: var(--accent);
+  text-decoration: underline solid var(--accent);
+}
+
+span.figure {
+  text-decoration: none;
+}
+
+.context {
+  color: var(--text-2);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-3);
+}
+
+.methodLink {
+  color: var(--text-2);
+}
+
+.stale {
+  padding: 10px 20px;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.staleMessage {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.retry {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-chip);
+  border: 1px solid currentColor;
+  background: transparent;
+  color: var(--warn);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---------- Lists ---------- */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+}
+
+.listRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.listRow:last-child {
+  border-bottom: 0;
+}
+
+.listRowWide {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  padding: 7px 0;
+}
+
+.listLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listValue {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.listRowWide .listValue {
+  font-weight: 400;
+}

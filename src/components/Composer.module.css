@@ -1,0 +1,169 @@
+.heroForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+}
+
+/* Focused: 1 px accent border + 4 px soft ring. */
+.hero:focus-within,
+.inline:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.heroInput {
+  padding: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 28px;
+}
+
+/* The box itself carries the focus ring. */
+.heroInput:focus-visible,
+.inlineInput:focus-visible {
+  outline: none;
+}
+
+.heroInput::placeholder,
+.inlineInput::placeholder {
+  color: var(--text-3);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.scope {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-2);
+}
+
+.scope select {
+  appearance: none;
+  height: 32px;
+  padding: 0 28px 0 10px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.scope svg {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.send {
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 10px;
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stop {
+  border: 1px solid var(--border-control);
+  background: transparent;
+}
+
+.stopMark {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--text);
+}
+
+.freshness {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 16px;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+}
+
+.inlineInput {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.inline .send {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-control);
+}
+
+/* Phone: the follow-up bar becomes a pill docked to the bottom. */
+@media (max-width: 760px) {
+  .inline {
+    position: sticky;
+    bottom: 16px;
+    z-index: 5;
+    padding: 4px 4px 4px 16px;
+    border-radius: 24px;
+    box-shadow: 0 0 0 12px var(--bg);
+  }
+
+  .inlineInput {
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .inline .send {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+  }
+
+  .hint {
+    display: none;
+  }
+}

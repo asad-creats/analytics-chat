@@ -1,0 +1,220 @@
+/* ---------- Buttons ---------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border);
+  background: var(--raised);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--border-control);
+  background: var(--code-bg);
+}
+
+.sm {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-chip);
+  font-size: 12px;
+}
+
+.md {
+  height: 32px;
+}
+
+.lg {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.primary {
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--accent);
+  filter: brightness(1.08);
+}
+
+/* Bordered with the control colour: inputs-level emphasis. */
+.secondary {
+  border-color: var(--border-control);
+  background: transparent;
+}
+
+.ghost {
+  background: transparent;
+  color: var(--text-2);
+}
+
+.iconOnly {
+  width: 32px;
+  padding: 0;
+}
+
+/* ---------- Pin ---------- */
+
+.pin {
+  background: transparent;
+}
+
+.pinned,
+.pinned:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.pinIcon {
+  width: 32px;
+  height: 32px;
+  margin: -6px -6px 0 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.pinIcon[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.pinIcon:hover {
+  background: var(--hover);
+}
+
+/* ---------- Chips ---------- */
+
+.suggestion {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--raised);
+  color: var(--text);
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.suggestion:hover {
+  border-color: var(--border-control);
+  background: var(--code-bg);
+}
+
+.suggestion:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-chip);
+  background: var(--code-bg);
+  font-size: 12px;
+}
+
+.filter strong {
+  font-weight: 600;
+}
+
+/* ---------- Status ---------- */
+
+.demo {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--radius-chip);
+  border: 1px dashed var(--border-control);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.freshness {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-2);
+}
+
+/* Shape changes with state (dot, ring, diamond) so colour is never the only cue. */
+.marker {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+.refreshing .marker {
+  background: transparent;
+  border: 1.5px solid var(--accent);
+}
+
+.stale {
+  color: var(--warn);
+  font-weight: 500;
+}
+
+.stale .marker {
+  border-radius: 1px;
+  background: var(--warn);
+  transform: rotate(45deg);
+}
+
+/* ---------- Segmented toggle ---------- */
+
+.segmented {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-control);
+  background: var(--code-bg);
+}
+
+.segment {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-chip);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.segment[aria-pressed='true'] {
+  border-color: var(--border);
+  background: var(--raised);
+  color: var(--text);
+  font-weight: 500;
+}

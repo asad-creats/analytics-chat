@@ -1,0 +1,278 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+}
+
+.question {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lead {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-3);
+}
+
+.footerLink {
+  color: var(--text-2);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+details.footer {
+  display: block;
+}
+
+.dataScope {
+  margin-top: 8px;
+  color: var(--text-2);
+}
+
+.pushDown {
+  margin-top: auto;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+/* ---------- Loading ---------- */
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.done {
+  color: var(--text-2);
+}
+
+.active {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.pending {
+  color: var(--text-3);
+}
+
+/* The skeleton gently pulses; with reduced motion it stays still. */
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton {
+  height: 12px;
+  border-radius: 4px;
+  background: var(--skeleton);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+.skeletonText {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeletonText .skeleton {
+  height: 14px;
+}
+
+.skeletonBars {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 48px;
+  column-gap: 16px;
+  row-gap: 14px;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.skeletonRow {
+  display: contents;
+}
+
+.skeletonBar {
+  height: 24px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* ---------- Ambiguous ---------- */
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border-control);
+  background: var(--raised);
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.option:hover {
+  background: var(--code-bg);
+}
+
+.optionUnit {
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+/* ---------- No results ---------- */
+
+.noneBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.none {
+  align-self: flex-start;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 600;
+  text-decoration: underline dotted var(--text-3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+
+/* ---------- Error ---------- */
+
+.errorNotice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: var(--radius-control);
+  background: var(--danger-soft);
+}
+
+.errorText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.errorText strong {
+  font-weight: 600;
+}
+
+/* ---------- Can't answer ---------- */
+
+.related {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  padding: 8px 16px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--accent);
+  background: var(--raised);
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.related:hover {
+  background: var(--accent-soft);
+}
+
+/* ---------- Empty board ---------- */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 32px;
+  border: 1px dashed var(--border-control);
+  border-radius: var(--radius-card);
+  color: var(--text-3);
+}
+
+.emptyTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.emptyText {
+  color: var(--text-2);
+}
+
+.emptyAction {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border-control);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}

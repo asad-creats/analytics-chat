@@ -1,0 +1,26 @@
+.region {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  z-index: 50;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--raised);
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: var(--shadow-float);
+  animation: answer-in var(--duration-answer) ease-out both;
+}
+
+@media (max-width: 760px) {
+  .region {
+    bottom: 104px;
+  }
+}

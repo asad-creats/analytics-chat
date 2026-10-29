@@ -1,0 +1,114 @@
+/*
+ * Pipeline design tokens. Values come from the "Type & colour spec" sheet.
+ * Light is the default; dark follows the OS unless data-theme pins one.
+ */
+:root {
+  --bg: #ffffff;
+  --surface: #f7f7f8; /* nav, table heads, states backdrop */
+  --raised: #ffffff; /* cards, inputs */
+  --hover: #ededef;
+  --border: #e4e4e7; /* dividers only (decorative) */
+  --border-control: #8a8a93; /* inputs, buttons, axes */
+  --grid: #e4e4e7;
+  --skeleton: #ededef;
+
+  --text: #18181b;
+  --text-2: #52525b;
+  --text-3: #6b6b74;
+
+  --accent: #0f766e; /* interaction only: send, focus, pinned, links */
+  --on-accent: #ffffff;
+  --accent-soft: #e7f3f1;
+  --accent-text: #0b5f59;
+
+  --warn: #8a5300;
+  --warn-soft: #fff5e0;
+  --danger: #b42318;
+  --danger-soft: #fdedeb;
+  --code-bg: #f4f4f5;
+
+  /* Chart palette: separate from the accent, one meaning per slot. */
+  --series-1: #2563a8; /* primary: the thing asked about */
+  --series-2: #c2570c; /* comparison */
+  --series-3: #b83f7c;
+  --series-4: #9a7400;
+  --series-5: #6b7280; /* everyone else / benchmarks */
+
+  --shadow-float: 0 12px 32px rgba(24, 24, 27, 0.1), 0 2px 6px rgba(24, 24, 27, 0.06);
+
+  --radius-chip: 6px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-card-mobile: 16px;
+
+  --font-sans: Geist, Inter, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  --duration-answer: 160ms;
+  --duration-panel: 200ms;
+  --duration-bars: 240ms;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0e0f11;
+    --surface: #131518;
+    --raised: #16181b;
+    --hover: #22252a;
+    --border: #2a2d33;
+    --border-control: #5c616a;
+    --grid: #2a2d33;
+    --skeleton: #24272c;
+    --text: #edeef0;
+    --text-2: #a6abb3;
+    --text-3: #8d929b;
+    --accent: #3cc6be;
+    --on-accent: #0e0f11;
+    --accent-soft: #10302e;
+    --accent-text: #5fd4cd;
+    --warn: #f5b544;
+    --warn-soft: #2e2412;
+    --danger: #f97066;
+    --danger-soft: #2f1715;
+    --code-bg: #1b1e22;
+    --series-1: #5b9be0;
+    --series-2: #f08a3e;
+    --series-3: #e57ab0;
+    --series-4: #d4ae2e;
+    --series-5: #9ca3af;
+    --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0e0f11;
+  --surface: #131518;
+  --raised: #16181b;
+  --hover: #22252a;
+  --border: #2a2d33;
+  --border-control: #5c616a;
+  --grid: #2a2d33;
+  --skeleton: #24272c;
+  --text: #edeef0;
+  --text-2: #a6abb3;
+  --text-3: #8d929b;
+  --accent: #3cc6be;
+  --on-accent: #0e0f11;
+  --accent-soft: #10302e;
+  --accent-text: #5fd4cd;
+  --warn: #f5b544;
+  --warn-soft: #2e2412;
+  --danger: #f97066;
+  --danger-soft: #2f1715;
+  --code-bg: #1b1e22;
+  --series-1: #5b9be0;
+  --series-2: #f08a3e;
+  --series-3: #e57ab0;
+  --series-4: #d4ae2e;
+  --series-5: #9ca3af;
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
+}

@@ -1,0 +1,367 @@
+/* Bars grow once from the axis, 240 ms. */
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+/* ---------- Horizontal bars ---------- */
+
+.hbar {
+  display: grid;
+  align-items: center;
+}
+
+.hbarRow {
+  display: contents;
+}
+
+.full {
+  grid-template-columns: 160px minmax(0, 1fr) 96px;
+  column-gap: 16px;
+  row-gap: 12px;
+}
+
+.compact {
+  grid-template-columns: 120px minmax(0, 1fr) 56px;
+  column-gap: 12px;
+  row-gap: 6px;
+  font-size: 13px;
+}
+
+.mini {
+  grid-template-columns: 96px minmax(0, 1fr) 44px;
+  column-gap: 8px;
+  row-gap: 6px;
+  font-size: 12px;
+}
+
+.rowLabel {
+  display: flex;
+  flex-direction: column;
+}
+
+.rowName {
+  font-weight: 500;
+}
+
+.rowSub {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.track {
+  position: relative;
+  height: 28px;
+}
+
+.compact .track {
+  height: 12px;
+}
+
+.mini .track {
+  height: 10px;
+}
+
+.axisLine,
+.gridLine {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  border-left: 1px solid var(--border-control);
+}
+
+.gridLine {
+  border-left: 1px dashed var(--grid);
+}
+
+.bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  transform-origin: left;
+  animation: grow-x var(--duration-bars) ease-out both;
+}
+
+.compact .bar,
+.mini .bar {
+  border-radius: 0 3px 3px 0;
+}
+
+.annotation {
+  position: absolute;
+  top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.annotationRule {
+  width: 24px;
+  border-top: 1px solid var(--text-3);
+}
+
+.value {
+  text-align: left;
+}
+
+.mini .value {
+  text-align: right;
+}
+
+.full .value {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.valueStrong {
+  font-weight: 600;
+}
+
+.axisTitle {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.tickRow {
+  position: relative;
+  height: 16px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.tick,
+.tickFirst,
+.tickLast {
+  position: absolute;
+}
+
+.tick {
+  transform: translateX(-50%);
+}
+
+.tickFirst {
+  left: 0;
+}
+
+.tickLast {
+  right: 0;
+}
+
+@media (max-width: 760px) {
+  .full {
+    grid-template-columns: 104px minmax(0, 1fr) 52px;
+    column-gap: 12px;
+  }
+
+  .annotation,
+  .tick {
+    display: none;
+  }
+}
+
+/* ---------- Columns ---------- */
+
+.columns {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.columnPlot {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.columnBar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  background: var(--series-1);
+  transform-origin: bottom;
+  animation: grow-y var(--duration-bars) ease-out both;
+}
+
+.partial {
+  opacity: 0.5;
+}
+
+.reference {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--text-3);
+}
+
+.referenceLabel {
+  position: absolute;
+  right: 0;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--text-2);
+}
+
+.columnLabels {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* ---------- Lines ---------- */
+
+.line {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+
+.lineMini {
+  font-size: 11px;
+}
+
+.svgAxis {
+  stroke: var(--border-control);
+  stroke-width: 1;
+}
+
+.svgGrid {
+  stroke: var(--grid);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.svgMuted {
+  fill: var(--text-3);
+}
+
+.svgSecondary {
+  fill: var(--text-2);
+}
+
+.svgStrong {
+  fill: var(--text);
+  font-weight: 600;
+}
+
+.svgLabel {
+  fill: var(--text);
+  font-weight: 500;
+}
+
+.svgLine {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.svgPoint {
+  fill: currentColor;
+}
+
+.svgPointRing {
+  fill: currentColor;
+  stroke: var(--raised);
+  stroke-width: 2;
+}
+
+/* ---------- Table ---------- */
+
+.tableBox {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  padding: 10px 12px;
+  background: var(--surface);
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.table td {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.table td:first-child {
+  font-weight: 500;
+}
+
+.muted {
+  color: var(--text-2);
+}
+
+.table td.strong {
+  font-weight: 600;
+}
+
+/* ---------- Figure ---------- */
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.figurePadded {
+  padding: 24px;
+}
+
+.figureHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.captionTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.captionSub {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-2);
+}
