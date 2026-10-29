@@ -13,6 +13,17 @@ npm run dev
 
 `npm run build` type-checks and builds to `dist/`.
 
+## Portfolio build
+
+The app also runs at `/pipeline/` on the portfolio site (`asad-creats/projects`). To update it there:
+
+```bash
+npm run build:portfolio
+rm -rf ../projects/public/pipeline && cp -r dist-portfolio ../projects/public/pipeline
+```
+
+Then commit and push `projects`; Vercel redeploys it from `master`.
+
 ## Pages
 
 | Route | Screen |
