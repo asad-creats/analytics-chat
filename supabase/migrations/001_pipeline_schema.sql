@@ -80,10 +80,17 @@ create table if not exists pipeline.deal_deadlines (
   done      boolean not null default false
 );
 
--- When the data was last refreshed (by the demo simulator or a CRM sync).
+-- Where the data comes from and when it was last refreshed. A CRM sync
+-- sets crm/status; the demo simulator leaves it as 'demo'.
 create table if not exists pipeline.sync_state (
   id          int primary key default 1 check (id = 1),
   source      text not null default 'demo',
+  crm         text not null default 'Demo CRM',
+  status      text not null default 'demo'
+    check (status in ('demo', 'connected', 'syncing', 'error', 'disconnected')),
+  account     text,
+  last_error  text,
+  sync_every  interval not null default interval '15 minutes',
   timezone    text not null default 'America/New_York',
   synced_at   timestamptz not null default now()
 );
@@ -173,6 +180,17 @@ as $$
     'timezone', (select timezone from sync_state),
     'synced_at', (select synced_at from sync_state),
     'data_source', (select source from sync_state),
+    'crm', (select jsonb_build_object('name', crm, 'status', status, 'account', account,
+                                      'last_error', last_error, 'sync_every_minutes',
+                                      extract(epoch from sync_every) / 60)
+              from sync_state),
+    'counts', jsonb_build_object(
+      'leads', (select count(*) from leads where not is_duplicate),
+      'activities', (select count(*) from activities),
+      'appointments', (select count(*) from appointments),
+      'deals', (select count(*) from deals),
+      'agents', (select count(*) from agents where active)),
+    'last_activity_at', (select max(occurred_at) from activities),
     'lead_count', (select count(*) from leads where not is_duplicate),
     'first_lead_at', (select min(created_at) from leads),
     'agents', (select jsonb_agg(name order by name) from agents where active),
@@ -185,9 +203,10 @@ $$;
 alter function public.pipeline_run_query(text) owner to pipeline_reader;
 alter function public.pipeline_overview() owner to pipeline_reader;
 
--- Free tier: counts a question against the visitor's and the whole site's daily
--- caps. Returns whether it's allowed plus the visitor's usage.
-create or replace function public.pipeline_consume_quota(client text, per_client int, site_total int)
+-- Free tier: counts a question (or a report, which costs more) against the
+-- visitor's and the whole site's daily caps. Returns whether it's allowed plus
+-- the visitor's usage.
+create or replace function public.pipeline_consume_quota(client text, per_client int, site_total int, cost int default 1)
 returns jsonb
 language plpgsql
 security definer
@@ -203,26 +222,26 @@ begin
   select coalesce(max(count), 0) into used_client from ask_usage
    where usage_date = current_date and client_hash = client;
 
-  if used_client >= per_client or used_site >= site_total then
+  if used_client + cost > per_client or used_site + cost > site_total then
     return jsonb_build_object('allowed', false, 'used', used_client, 'limit', per_client,
                               'site_full', used_site >= site_total);
   end if;
 
-  insert into ask_usage (usage_date, client_hash, count) values (current_date, client, 1)
-  on conflict (usage_date, client_hash) do update set count = ask_usage.count + 1;
-  return jsonb_build_object('allowed', true, 'used', used_client + 1, 'limit', per_client);
+  insert into ask_usage (usage_date, client_hash, count) values (current_date, client, cost)
+  on conflict (usage_date, client_hash) do update set count = ask_usage.count + cost;
+  return jsonb_build_object('allowed', true, 'used', used_client + cost, 'limit', per_client);
 end;
 $$;
 
 revoke all on function public.pipeline_run_query(text) from public;
 revoke all on function public.pipeline_overview() from public;
-revoke all on function public.pipeline_consume_quota(text, int, int) from public;
+revoke all on function public.pipeline_consume_quota(text, int, int, int) from public;
 do $$
 begin
   if exists (select 1 from pg_roles where rolname = 'service_role') then
     grant execute on function public.pipeline_run_query(text) to service_role;
     grant execute on function public.pipeline_overview() to service_role;
-    grant execute on function public.pipeline_consume_quota(text, int, int) to service_role;
+    grant execute on function public.pipeline_consume_quota(text, int, int, int) to service_role;
   end if;
 end
 $$;

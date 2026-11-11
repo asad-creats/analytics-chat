@@ -7,7 +7,7 @@
 
 import pg from "npm:pg@8.13.1";
 import { assert, assertEquals, assertMatch } from "jsr:@std/assert@1.0.13";
-import { type Db, runAgent } from "../functions/pipeline-ask/agent.ts";
+import { type Db, runAgent, runReport } from "../functions/pipeline-ask/agent.ts";
 import { type LlmConfig, LlmError, type LoopRunner, runToolLoop } from "../functions/pipeline-ask/providers.ts";
 
 const DB_URL = Deno.env.get("PIPELINE_TEST_DB") ?? "postgres://postgres:local@localhost:5432/pipeline";
@@ -138,6 +138,43 @@ Deno.test("agent: clarify and cannot_answer don't need a query", async () => {
   assertEquals(result.answer.options?.length, 2);
 });
 
+Deno.test("report: needs every section and a query, then comes back tidy", async () => {
+  const replies: string[] = [];
+  const section = (heading: string) => ({
+    heading,
+    summary: `${heading}: **3** things.`,
+    basis: "Based on the demo data",
+    chart: { type: "bar", title: heading, series: [{ name: "n", points: [{ label: "A", value: 3 }] }] },
+  });
+  const report = {
+    title: "Daily report",
+    period_label: "Yesterday",
+    highlights: ["Jordan has **3** leads waiting", "Evening response slipped to **61 min**", "2 deals close this week"],
+    basis: "All leads",
+  };
+  const result = await runReport({
+    options: { period: "yesterday", sections: ["lead_flow", "waiting_leads"], preset: "daily" },
+    llm: fakeLlm,
+    db: localDb,
+    loop: scripted(
+      [
+        { name: "give_report", args: { ...report, sections: [section("Lead flow"), section("Waiting")] } },
+        { name: "run_query", args: { sql: "select count(*) from pipeline.leads", purpose: "count" } },
+        { name: "give_report", args: { ...report, sections: [section("Lead flow")] } },
+        { name: "give_report", args: { ...report, highlights: ["just one"], sections: [section("Lead flow"), section("Waiting")] } },
+        { name: "give_report", args: { ...report, sections: [section("Lead flow"), section("Waiting")] } },
+      ],
+      replies,
+    ),
+  });
+  assertMatch(replies[0], /look the data up with run_query first/);
+  assertMatch(replies[2], /Include all 2 requested sections/);
+  assertMatch(replies[3], /highlights needs/);
+  assertEquals(replies[4], "Delivered.");
+  assertEquals(result.report.sections.map((s) => s.heading), ["Lead flow", "Waiting"]);
+  assertEquals(result.report.highlights.length, 3);
+});
+
 Deno.test("agent: the model can't escape read-only access", async () => {
   const attempts = [
     "select set_config('role', 'postgres', false)",
@@ -190,7 +227,7 @@ Deno.test("http: free tier quota, validation and own-key errors through the real
   const argOrder: Record<string, string[]> = {
     pipeline_overview: [],
     pipeline_run_query: ["q"],
-    pipeline_consume_quota: ["client", "per_client", "site_total"],
+    pipeline_consume_quota: ["client", "per_client", "site_total", "cost"],
   };
   const rest = Deno.serve({ port: 54401, onListen() {} }, async (req) => {
     const fn = new URL(req.url).pathname.split("/").pop()!;
@@ -250,6 +287,19 @@ Deno.test("http: free tier quota, validation and own-key errors through the real
 
     const bad = await ask({ question: "Hi", llm: { provider: "nope", apiKey: "x" } });
     assertEquals(bad.body.error.code, "bad_request");
+
+    const noSections = await ask({ action: "report", options: { period: "yesterday", sections: [] } });
+    assertEquals(noSections.body.error.code, "bad_request");
+    const ownReport = await ask({
+      action: "report",
+      options: { period: "yesterday", sections: ["lead_flow", "made_up"] },
+      llm: { provider: "anthropic", apiKey: "sk-ant-invalid" },
+    });
+    assertEquals(ownReport.body.error.code, "llm_auth");
+    // The free tier is already used up, and a report costs 3.
+    const freeReport = await ask({ action: "report", options: { period: "yesterday", sections: ["lead_flow"] } });
+    assertEquals(freeReport.body.error.code, "daily_limit");
+    assertMatch(freeReport.body.error.message, /A report uses 3/);
   } finally {
     fn.kill();
     await fn.status;

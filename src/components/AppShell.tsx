@@ -6,6 +6,7 @@ import { useConversations } from '../state/conversations';
 import { providers, useSettings } from '../state/settings';
 import { AiSettingsDialog } from './AiSettingsDialog';
 import { DemoBadge, FreshnessLine } from './controls';
+import { crmStatusLabel, crmTone, syncedLabel } from './crm';
 import { Icon, Logo } from './Icon';
 import styles from './AppShell.module.css';
 
@@ -45,10 +46,18 @@ function Sidebar() {
           <Icon name="ask" />
           Ask
         </NavLink>
+        <NavLink to="/reports" className={navClass}>
+          <Icon name="report" />
+          Reports
+        </NavLink>
         <NavLink to="/board" className={navClass}>
           <Icon name="board" />
           Pinned board
           <span className={styles.count}>{pins.length}</span>
+        </NavLink>
+        <NavLink to="/data" className={navClass}>
+          <Icon name="database" />
+          Data source
         </NavLink>
       </div>
 
@@ -66,6 +75,7 @@ function Sidebar() {
       </div>
 
       <div className={styles.footer}>
+        <DataSourceCard />
         <button type="button" className={styles.aiButton} onClick={openSettings}>
           <Icon name="sliders" />
           <span className={styles.aiText}>
@@ -87,6 +97,30 @@ function Sidebar() {
   );
 }
 
+/** Which CRM the answers come from, and whether it's connected. */
+function DataSourceCard() {
+  const { status, statusError } = useSettings();
+  const crm = status?.crm;
+  return (
+    <Link to="/data" className={styles.sourceCard}>
+      <span className={styles.sourceLabel}>Data source</span>
+      <span className={styles.sourceName}>
+        <Icon name="database" />
+        {crm?.name ?? (statusError ? 'Not connected' : 'Connecting…')}
+      </span>
+      <FreshnessLine state={statusError ? 'stale' : crmTone(crm?.status)}>
+        {statusError
+          ? statusError
+          : status && crm
+            ? `${crmStatusLabel[crm.status]} · synced ${syncedLabel(status)}`
+            : browserDemo
+              ? 'Loading the demo database…'
+              : 'Checking…'}
+      </FreshnessLine>
+    </Link>
+  );
+}
+
 export function AppShell() {
   return (
     <div className={styles.shell}>
@@ -99,23 +133,28 @@ export function AppShell() {
   );
 }
 
-/** "Data as of 2:45 PM · 427 leads", or why there's no data. */
+/** "Demo CRM · data as of 2:45 PM · 427 leads", or why there's no data. Links to the data source page. */
 function LiveFreshness() {
   const { status, statusError } = useSettings();
-  if (statusError) return <FreshnessLine state="stale">{statusError}</FreshnessLine>;
-  if (!status) {
-    return <FreshnessLine state="refreshing">{browserDemo ? 'Loading the demo database…' : 'Connecting to the CRM…'}</FreshnessLine>;
+  let line: ReactNode;
+  if (statusError) {
+    line = <FreshnessLine state="stale">{statusError}</FreshnessLine>;
+  } else if (!status) {
+    line = (
+      <FreshnessLine state="refreshing">{browserDemo ? 'Loading the demo database…' : 'Connecting to the CRM…'}</FreshnessLine>
+    );
+  } else {
+    const stale = Date.now() - new Date(status.as_of).getTime() > 2 * 60 * 60 * 1000;
+    line = (
+      <FreshnessLine state={stale ? 'stale' : crmTone(status.crm?.status)}>
+        {status.crm?.name ?? 'CRM'} · data as of {syncedLabel(status)} · {status.lead_count.toLocaleString()} leads
+      </FreshnessLine>
+    );
   }
-
-  const asOf = new Date(status.as_of);
-  const sameDay = asOf.toDateString() === new Date().toDateString();
-  const time = asOf.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-  const when = sameDay ? time : `${asOf.toLocaleDateString([], { month: 'short', day: 'numeric' })} ${time}`;
-  const stale = Date.now() - asOf.getTime() > 2 * 60 * 60 * 1000;
   return (
-    <FreshnessLine state={stale ? 'stale' : 'fresh'}>
-      Data as of {when} · {status.lead_count.toLocaleString()} leads
-    </FreshnessLine>
+    <Link to="/data" className={styles.freshLink}>
+      {line}
+    </Link>
   );
 }
 
@@ -145,6 +184,9 @@ export function TopBar({ title }: TopBarProps) {
           </Link>
           <div className={styles.mobileActions}>
             <DemoBadge short />
+            <Link to="/reports" aria-label="Reports" className={styles.mobileIcon}>
+              <Icon name="report" size={18} />
+            </Link>
             <Link to="/board" aria-label="Pinned board" className={styles.mobileIcon}>
               <Icon name="board" size={18} />
             </Link>

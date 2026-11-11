@@ -26,8 +26,13 @@ export function niceMax(max: number): number {
   return step * magnitude;
 }
 
+/** A step of 1, 2, 2.5 or 5 times a power of ten. */
+const isRound = (step: number) => [1, 2, 2.5, 5, 10].some((n) => Math.abs(step / 10 ** Math.floor(Math.log10(step)) - n) < 1e-9);
+
+/** Five or four even steps, whichever lands on round numbers: 0–5–10–15–20, 0–1–2–3–4–5. */
 function ticksFor(max: number): number[] {
-  return [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round(max * f * 100) / 100);
+  const parts = isRound(max / 5) ? 5 : 4;
+  return Array.from({ length: parts + 1 }, (_, i) => Math.round((max * i * 100) / parts) / 100);
 }
 
 function tableFor(chart: ChartSpec) {

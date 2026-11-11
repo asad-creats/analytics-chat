@@ -1,3 +1,7 @@
+import type { Report, ReportOptions } from '../../supabase/functions/pipeline-ask/report.ts';
+
+export type { Report, ReportOptions, ReportSection } from '../../supabase/functions/pipeline-ask/report.ts';
+
 /**
  * Client for the pipeline-ask Edge Function. The answer shape mirrors
  * supabase/functions/pipeline-ask/answer.ts.
@@ -34,12 +38,26 @@ export interface AnswerMeta {
   usage?: { used: number; limit: number };
 }
 
+export type CrmStatus = 'demo' | 'connected' | 'syncing' | 'error' | 'disconnected';
+
+/** Where the data comes from: which CRM, and whether it's connected. */
+export interface CrmInfo {
+  name: string;
+  status: CrmStatus;
+  account: string | null;
+  last_error: string | null;
+  sync_every_minutes: number;
+}
+
 export interface DataStatus {
   as_of: string;
   timezone: string;
   lead_count: number;
   agents: string[];
   source: string;
+  crm: CrmInfo;
+  counts: { leads: number; activities: number; appointments: number; deals: number; agents: number };
+  last_activity_at: string | null;
   free_tier: boolean;
   free_per_visitor: number;
 }
@@ -113,6 +131,11 @@ export interface HistoryTurn {
 export async function ask(question: string, history: HistoryTurn[], ownKey?: OwnKey) {
   if (browserDemo) return (await demo()).ask(question, history, ownKey);
   return call<{ answer: Answer; meta: AnswerMeta }>({ question, history, llm: ownKey });
+}
+
+export async function generateReport(options: ReportOptions, ownKey?: OwnKey) {
+  if (browserDemo) return (await demo()).report(options, ownKey);
+  return call<{ report: Report; meta: AnswerMeta }>({ action: 'report', options, llm: ownKey });
 }
 
 export async function fetchStatus() {

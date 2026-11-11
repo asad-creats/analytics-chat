@@ -21,11 +21,11 @@ export function supabaseDb(url: string, serviceKey: string) {
     return body;
   };
 
-  const db: Db & { consumeQuota(client: string, perClient: number, siteTotal: number): Promise<Quota> } = {
+  const db: Db & { consumeQuota(client: string, perClient: number, siteTotal: number, cost?: number): Promise<Quota> } = {
     overview: () => rpc("pipeline_overview", {}),
     runQuery: async (sql) => (await rpc("pipeline_run_query", { q: sql })) ?? [],
-    consumeQuota: (client, perClient, siteTotal) =>
-      rpc("pipeline_consume_quota", { client, per_client: perClient, site_total: siteTotal }),
+    consumeQuota: (client, perClient, siteTotal, cost = 1) =>
+      rpc("pipeline_consume_quota", { client, per_client: perClient, site_total: siteTotal, cost }),
   };
   return db;
 }

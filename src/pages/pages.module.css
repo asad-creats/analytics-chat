@@ -4,20 +4,20 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  padding: 48px 32px 32px;
+  padding: 24px 32px 32px;
 }
 
-/* Answers sit in an 880 px column. */
+/* Answers use the width they're given, up to a comfortable reading line for charts. */
 .column {
   width: 100%;
-  max-width: 880px;
+  max-width: 1120px;
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
 .thread {
-  gap: 32px;
+  gap: 24px;
 }
 
 .turn {

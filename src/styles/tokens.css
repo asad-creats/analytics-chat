@@ -51,7 +51,8 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
+/* Screen only: printed reports stay light. */
+@media screen and (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --bg: #0e0f11;
     --surface: #131518;

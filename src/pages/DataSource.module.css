@@ -1,0 +1,226 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 32px 32px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.lede {
+  color: var(--text-2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+}
+
+.cardLabel {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.crmName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--radius-chip);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.pill_fresh {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.pill_refreshing {
+  background: var(--code-bg);
+  color: var(--text-2);
+}
+
+.pill_stale {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.facts dt,
+.counts dt {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.facts dd {
+  margin: 2px 0 0;
+  font-weight: 500;
+}
+
+.counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+
+.counts div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.counts dd {
+  margin: 0;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.note {
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: var(--code-bg);
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.error {
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.muted {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.retry {
+  align-self: flex-start;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-control);
+  background: transparent;
+  font-size: 13px;
+}
+
+.list,
+.connectors {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li,
+.connectors li {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.list li:last-child,
+.connectors li:last-child {
+  border-bottom: 0;
+}
+
+.list strong {
+  flex: 0 0 104px;
+  font-weight: 600;
+}
+
+.list span {
+  color: var(--text-2);
+}
+
+.connectors li {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.connectors div {
+  display: flex;
+  flex-direction: column;
+}
+
+.connectors div span {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.state {
+  flex: none;
+  height: 24px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px dashed var(--border-control);
+  border-radius: var(--radius-chip);
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 16px;
+  }
+
+  .list li {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .list strong {
+    flex: none;
+  }
+}

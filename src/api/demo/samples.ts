@@ -5,6 +5,13 @@
  * answer says so.
  */
 import type { Db } from '../../../supabase/functions/pipeline-ask/agent.ts';
+import {
+  type Report,
+  type ReportOptions,
+  type ReportSection,
+  type SectionId,
+  sections,
+} from '../../../supabase/functions/pipeline-ask/report.ts';
 import type { Answer } from '../pipeline';
 
 const TZ = 'America/New_York';
@@ -257,4 +264,136 @@ export const sampleQuestions = Object.keys(samples);
 export async function sampleAnswer(question: string, db: Db): Promise<Answer | null> {
   const run = samples[normalise(question)];
   return run ? run(db) : null;
+}
+
+/* ---------- Reports ---------- */
+
+/** Report sections that only exist in reports, from fixed queries. */
+const reportOnly: Partial<Record<SectionId, (db: Db) => Promise<Answer>>> = {
+  agent_activity: async (db) => {
+    const rows = (await db.runQuery(`
+      select a.name,
+             count(*) filter (where x.type = 'call') as calls,
+             count(*) filter (where x.type = 'call' and x.outcome = 'connected') as connected,
+             count(*) filter (where x.type = 'text') as texts,
+             count(*) filter (where x.type = 'email') as emails
+      from agents a
+      left join activities x on x.agent_id = a.id and x.direction = 'outbound'
+        and x.occurred_at >= now() - interval '7 days'
+      where a.active
+      group by a.name order by calls desc`)) as Row[];
+    const top = rows[0];
+    const low = rows[rows.length - 1];
+    return {
+      kind: 'answer',
+      title: 'Agent activity · last 7 days',
+      summary: `${str(top.name)} made the most calls (**${num(top.calls)}**, ${num(top.connected)} connected); ${str(low.name)} made the fewest (**${num(low.calls)}**).`,
+      table: {
+        columns: ['Agent', 'Calls', 'Connected', 'Texts', 'Emails'],
+        rows: rows.map((r) => [str(r.name), String(num(r.calls)), String(num(r.connected)), String(num(r.texts)), String(num(r.emails))]),
+      },
+      basis: `Outbound activity in the last 7 days. ${NOTE}`,
+      follow_ups: [],
+    };
+  },
+
+  appointments: async (db) => {
+    const [held] = (await db.runQuery(`
+      select count(*) filter (where status = 'completed') as held, count(*) filter (where status = 'no-show') as no_shows
+      from appointments where scheduled_for between now() - interval '7 days' and now()`)) as Row[];
+    const rows = (await db.runQuery(`
+      select a.name as agent, count(*) as upcoming
+      from appointments ap join agents a on a.id = ap.agent_id
+      where ap.status = 'scheduled' and ap.scheduled_for between now() and now() + interval '3 days'
+      group by a.name order by upcoming desc`)) as Row[];
+    const upcoming = rows.reduce((s, r) => s + num(r.upcoming), 0);
+    return {
+      kind: 'answer',
+      title: 'Appointments',
+      headline: { value: String(upcoming), label: 'appointments in the next 3 days' },
+      summary: `**${num(held?.held)}** appointments were held in the last 7 days, with **${num(held?.no_shows)}** no-shows. **${upcoming}** are booked for the next 3 days.`,
+      chart: rows.length
+        ? {
+            type: 'bar',
+            title: 'Booked for the next 3 days, by agent',
+            unit: '',
+            series: [{ name: 'Appointments', points: rows.map((r) => ({ label: str(r.agent), value: num(r.upcoming) })) }],
+          }
+        : undefined,
+      basis: `Held and no-shows: last 7 days. Booked: next 3 days. ${NOTE}`,
+      follow_ups: [],
+    };
+  },
+
+  pipeline: async (db) => {
+    const rows = (await db.runQuery(`
+      select stage, count(*) as leads,
+             count(*) filter (where updated_at >= now() - interval '7 days') as moved
+      from leads where not is_duplicate and stage not in ('Lost')
+      group by stage
+      order by array_position(array['New','Attempted','Contacted','Appointment set','Showing','Offer','Under contract','Closed'], stage)`)) as Row[];
+    const moved = rows.filter((r) => ['Appointment set', 'Showing', 'Offer', 'Under contract', 'Closed'].includes(str(r.stage)));
+    const movedCount = moved.reduce((s, r) => s + num(r.moved), 0);
+    return {
+      kind: 'answer',
+      title: 'Pipeline by stage',
+      summary: `**${rows.reduce((s, r) => s + num(r.leads), 0)}** open and closed leads in the pipeline; **${movedCount}** moved into appointment, showing, offer, contract or closed in the last 7 days.`,
+      chart: {
+        type: 'bar',
+        title: 'Leads by current stage',
+        unit: '',
+        series: [{ name: 'Leads', points: rows.map((r) => ({ label: str(r.stage), value: num(r.leads) })) }],
+      },
+      basis: `Current stage of every lead except lost ones; movement over the last 7 days. ${NOTE}`,
+      follow_ups: [],
+    };
+  },
+};
+
+const sectionSample: Record<SectionId, string | null> = {
+  lead_flow: 'how many new leads came in this week',
+  speed_to_lead: 'why did evening response time slip last month',
+  waiting_leads: "who hasn't called their new leads this week",
+  agent_activity: null,
+  appointments: null,
+  pipeline: null,
+  deals_closing: 'which deals close in the next 14 days',
+  contingencies: 'which contingencies are due this week',
+  notes_themes: null,
+};
+
+const firstSentence = (text: string) => (text.match(/^.*?[.!?](\s|$)/)?.[0] ?? text).trim();
+
+/**
+ * A report without AI: each section from its fixed query and period. It says
+ * so, since the period, agent and focus the reader chose can't be honoured.
+ */
+export async function sampleReport(options: ReportOptions, db: Db): Promise<Report> {
+  const built: ReportSection[] = [];
+  for (const id of options.sections) {
+    const heading = sections[id].label;
+    const sampleKey = sectionSample[id];
+    const run = sampleKey ? samples[sampleKey] : reportOnly[id];
+    if (!run) {
+      built.push({
+        heading,
+        title: heading,
+        summary: 'Reading what leads wrote needs an AI key: add one in AI settings and generate this report again.',
+        basis: NOTE,
+      });
+      continue;
+    }
+    const { kind: _kind, options: _options, follow_ups: _followUps, ...answer } = await run(db);
+    built.push({ heading, ...answer });
+  }
+  return {
+    title: options.preset === 'daily' ? 'Daily report (sample)' : 'Report (sample)',
+    period_label: 'Sample report: each section uses its own fixed period',
+    highlights: built
+      .filter((s) => s.chart || s.table || s.headline)
+      .slice(0, 5)
+      .map((s) => firstSentence(s.summary)),
+    sections: built,
+    basis: `Without an AI key, sections come from fixed queries and the chosen period${options.agent ? ', agent' : ''}${options.focus ? ' and focus' : ''} are not applied. Add a key in AI settings for the full report.`,
+  };
 }

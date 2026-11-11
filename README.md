@@ -12,9 +12,17 @@ The demo runs entirely in your browser: a real Postgres database (PGlite) seeded
 |---|---|
 | ![Lead sources answer](screenshots/answer.png) | ![Response time trend](screenshots/trend.png) |
 
-| Pinned board | AI settings | Mobile (dark) |
-|---|---|---|
-| ![Pinned board](screenshots/board.png) | ![AI settings](screenshots/settings.png) | ![Mobile, dark mode](screenshots/mobile-dark.png) |
+| Daily report | Report builder |
+|---|---|
+| ![Daily report](screenshots/report.png) | ![Report builder](screenshots/report-builder.png) |
+
+| Data source | Pinned board |
+|---|---|
+| ![Data source](screenshots/data-source.png) | ![Pinned board](screenshots/board.png) |
+
+| AI settings | Mobile (dark) |
+|---|---|
+| ![AI settings](screenshots/settings.png) | ![Mobile, dark mode](screenshots/mobile-dark.png) |
 
 ## What it does
 
@@ -22,6 +30,8 @@ The demo runs entirely in your browser: a real Postgres database (PGlite) seeded
 - **Get a number, not an essay.** One or two sentences with the key figures, the right chart (bars to compare, columns for days, lines for trends) or a table of names, and what the answer is based on.
 - **Sensible by design.** Answers come only from the data. Vague questions get "which number did you mean?"; out-of-scope ones get "the CRM can't answer that, but here's a related question it can". When the data shows *when* something happened but not *why*, it says so.
 - **Follow-ups in context.** Keep asking in the same conversation ("break that down by agent").
+- **Reports.** A one-click daily report, or a custom one: pick the period, one agent or the whole team, the sections (lead flow, speed to lead, waiting leads, agent activity, appointments, pipeline, deals closing, deadlines, what leads are saying) and anything specific to pull out ("buyers who mention pre-approval"). The AI works through the data and leads with what stands out. Print or save as PDF.
+- **Knows where its data comes from.** The sidebar and the Data source page show which CRM is connected, whether it's live or demo data, when it last synced, how many records it holds and what the AI can read.
 - **Morning board.** Pin the answers you check every day; Refresh re-runs them on today's data.
 
 ## How it works

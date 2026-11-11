@@ -1,17 +1,23 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { browserDemo, isConnected } from '../api/pipeline';
 import { TopBar } from '../components/AppShell';
 import { Composer } from '../components/Composer';
+import { crmStatusLabel, syncedLabel } from '../components/crm';
+import { Icon } from '../components/Icon';
 import { starterGroups } from '../data/starters';
 import { useConversations } from '../state/conversations';
+import { useReports } from '../state/reports';
 import { useSettings } from '../state/settings';
+import { dailyPreset } from '../../supabase/functions/pipeline-ask/report.ts';
 import styles from './Home.module.css';
 
 export function Home() {
   const navigate = useNavigate();
   const { start } = useConversations();
-  const { openSettings } = useSettings();
+  const { openSettings, status } = useSettings();
+  const { generate } = useReports();
   const ask = (question: string) => navigate(`/c/${start(question)}`);
+  const dailyReport = () => navigate(`/reports/${generate(dailyPreset)}`);
 
   return (
     <>
@@ -73,6 +79,61 @@ export function Home() {
             </div>
           </section>
         </div>
+
+        <aside className={styles.rail} aria-label="Reports and data">
+          <div className={styles.railCard}>
+            <h2 className={styles.railTitle}>Reports</h2>
+            <button type="button" className={styles.railAction} onClick={dailyReport}>
+              <Icon name="report" />
+              <span>
+                Daily report
+                <small>Yesterday’s leads, speed to lead, what’s due</small>
+              </span>
+            </button>
+            <Link to="/reports" className={styles.railAction}>
+              <Icon name="sliders" />
+              <span>
+                Custom report
+                <small>Pick a period, agent, sections and focus</small>
+              </span>
+            </Link>
+          </div>
+
+          <div className={styles.railCard}>
+            <h2 className={styles.railTitle}>Data source</h2>
+            {status ? (
+              <>
+                <strong>
+                  {status.crm.name} · {crmStatusLabel[status.crm.status]}
+                </strong>
+                <dl className={styles.railStats}>
+                  <div>
+                    <dd className="tabular">{status.counts.leads.toLocaleString()}</dd>
+                    <dt>Leads</dt>
+                  </div>
+                  <div>
+                    <dd className="tabular">{status.counts.activities.toLocaleString()}</dd>
+                    <dt>Calls, texts & notes</dt>
+                  </div>
+                  <div>
+                    <dd className="tabular">{status.counts.appointments.toLocaleString()}</dd>
+                    <dt>Appointments</dt>
+                  </div>
+                  <div>
+                    <dd className="tabular">{status.counts.deals.toLocaleString()}</dd>
+                    <dt>Deals</dt>
+                  </div>
+                </dl>
+                <span className={styles.railLink}>Synced {syncedLabel(status)}</span>
+              </>
+            ) : (
+              <span className={styles.railLink}>{isConnected ? 'Loading…' : 'Not connected'}</span>
+            )}
+            <Link to="/data" className={styles.railLink}>
+              Where this data comes from
+            </Link>
+          </div>
+        </aside>
       </div>
     </>
   );

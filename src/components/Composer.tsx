@@ -66,7 +66,7 @@ export function Composer({
           </label>
           <textarea
             id={id}
-            rows={3}
+            rows={2}
             className={styles.heroInput}
             placeholder={busy ? busyText : placeholder}
             value={value}

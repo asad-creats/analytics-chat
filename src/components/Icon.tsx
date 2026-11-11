@@ -88,6 +88,26 @@ const icons = {
   },
   check: { box: 16, stroke: 1.75, body: <path d="M3.5 8.5l3 3 6-7" /> },
   pending: { box: 16, stroke: 1.5, body: <circle cx="8" cy="8" r="5.5" /> },
+  report: {
+    box: 16,
+    stroke: 1.5,
+    body: (
+      <>
+        <path d="M4 1.5h5.5L12.5 4.5v10h-8.5z" />
+        <path d="M9.5 1.5v3h3M6.5 8h4M6.5 10.5h4M6.5 13h2.5" />
+      </>
+    ),
+  },
+  database: {
+    box: 16,
+    stroke: 1.5,
+    body: (
+      <>
+        <ellipse cx="8" cy="3.75" rx="5" ry="2" />
+        <path d="M3 3.75v8.5c0 1.1 2.24 2 5 2s5-.9 5-2v-8.5M3 8c0 1.1 2.24 2 5 2s5-.9 5-2" />
+      </>
+    ),
+  },
   sliders: {
     box: 16,
     stroke: 1.5,

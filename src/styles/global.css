@@ -94,3 +94,22 @@ ol {
 .spin {
   animation: spin 0.9s linear infinite;
 }
+
+/* Printing a report: just the document, on white. */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body {
+    background: #fff;
+  }
+
+  nav,
+  header,
+  .no-print,
+  [role='group'] {
+    display: none !important;
+  }
+}

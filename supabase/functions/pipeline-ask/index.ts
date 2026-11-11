@@ -11,15 +11,18 @@
 //   supabase functions deploy pipeline-ask
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 
-import { runAgent } from "./agent.ts";
+import { runAgent, runReport } from "./agent.ts";
 import { supabaseDb } from "./db.ts";
 import type { HistoryTurn } from "./prompt.ts";
 import { defaultModels, type LlmConfig, LlmError, type ProviderId } from "./providers.ts";
+import { type Period, periods, type ReportOptions, type SectionId, sections } from "./report.ts";
 
 const PER_VISITOR = Number(Deno.env.get("PIPELINE_FREE_PER_VISITOR") ?? 10);
 const SITE_TOTAL = Number(Deno.env.get("PIPELINE_FREE_SITE_TOTAL") ?? 60);
 const FREE_MODEL = Deno.env.get("PIPELINE_FREE_MODEL") ?? defaultModels.gemini;
 const PROVIDERS: ProviderId[] = ["gemini", "anthropic", "openai", "openrouter"];
+/** A report runs several lookups and a longer answer: it counts as this many free questions. */
+const REPORT_COST = 3;
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -50,6 +53,22 @@ function readHistory(raw: unknown): HistoryTurn[] {
     .filter((t) => t.question);
 }
 
+function readReportOptions(raw: unknown): ReportOptions | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  const period = o.period as Period;
+  if (!(period in periods)) return null;
+  const chosen = (Array.isArray(o.sections) ? o.sections : []).filter((id): id is SectionId => typeof id === "string" && id in sections);
+  if (chosen.length === 0) return null;
+  return {
+    period,
+    sections: [...new Set(chosen)].slice(0, 9),
+    agent: typeof o.agent === "string" && o.agent.trim() ? o.agent.trim().slice(0, 60) : null,
+    focus: typeof o.focus === "string" ? o.focus.trim().slice(0, 300) : undefined,
+    preset: o.preset === "daily" ? "daily" : "custom",
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return fail("bad_request", "Use POST.", 405);
@@ -73,6 +92,9 @@ Deno.serve(async (req) => {
         lead_count: o.lead_count,
         agents: o.agents,
         source: o.data_source,
+        crm: o.crm,
+        counts: o.counts,
+        last_activity_at: o.last_activity_at,
         free_tier: Boolean(Deno.env.get("GEMINI_API_KEY")),
         free_per_visitor: PER_VISITOR,
       });
@@ -81,8 +103,16 @@ Deno.serve(async (req) => {
     }
   }
 
-  const question = typeof body.question === "string" ? body.question.trim().slice(0, 500) : "";
-  if (!question) return fail("bad_request", "Ask a question.", 400);
+  // A report, or a single question.
+  let reportOptions: ReportOptions | null = null;
+  let question = "";
+  if (body.action === "report") {
+    reportOptions = readReportOptions(body.options);
+    if (!reportOptions) return fail("bad_request", "Pick a period and at least one section.", 400);
+  } else {
+    question = typeof body.question === "string" ? body.question.trim().slice(0, 500) : "";
+    if (!question) return fail("bad_request", "Ask a question.", 400);
+  }
 
   // Own key, or the free tier.
   let llm: LlmConfig;
@@ -99,14 +129,18 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("GEMINI_API_KEY");
     if (!apiKey) return fail("not_configured", "The free tier isn't set up yet. Add your own key in AI settings.", 503);
     try {
-      const quota = await db.consumeQuota(await visitorHash(req), PER_VISITOR, SITE_TOTAL);
+      const quota = await db.consumeQuota(await visitorHash(req), PER_VISITOR, SITE_TOTAL, reportOptions ? REPORT_COST : 1);
       if (!quota.allowed) {
         return quota.site_full
           ? fail("site_limit", "The free demo is out of questions for today. Add your own key in AI settings to keep going.", 429)
-          : fail("daily_limit", `You've used your ${quota.limit} free questions today. Add your own key in AI settings to keep going.`, 429, {
-            used: quota.used,
-            limit: quota.limit,
-          });
+          : fail(
+            "daily_limit",
+            reportOptions
+              ? `A report uses ${REPORT_COST} of your ${quota.limit} free questions a day, and there aren't enough left today. Add your own key in AI settings to keep going.`
+              : `You've used your ${quota.limit} free questions today. Add your own key in AI settings to keep going.`,
+            429,
+            { used: quota.used, limit: quota.limit },
+          );
       }
       usage = { used: quota.used, limit: quota.limit };
     } catch (error) {
@@ -116,19 +150,21 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const result = await runAgent({ question, history: readHistory(body.history), llm, db });
-    return json({
-      answer: result.answer,
-      meta: {
-        as_of: result.asOf,
-        mode: own?.apiKey ? "own" : "free",
-        provider: llm.provider,
-        model: llm.model,
-        steps: result.steps,
-        queries: result.queries,
-        usage,
-      },
+    const meta = (asOf: string | null, steps: number, queries: number) => ({
+      as_of: asOf,
+      mode: own?.apiKey ? "own" : "free",
+      provider: llm.provider,
+      model: llm.model,
+      steps,
+      queries,
+      usage,
     });
+    if (reportOptions) {
+      const result = await runReport({ options: reportOptions, llm, db });
+      return json({ report: result.report, meta: meta(result.asOf, result.steps, result.queries) });
+    }
+    const result = await runAgent({ question, history: readHistory(body.history), llm, db });
+    return json({ answer: result.answer, meta: meta(result.asOf, result.steps, result.queries) });
   } catch (error) {
     if (error instanceof LlmError) {
       const status = error.code === "auth" ? 401 : error.code === "rate_limit" ? 429 : 502;

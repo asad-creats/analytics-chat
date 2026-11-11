@@ -1,35 +1,137 @@
 .page {
   flex: 1;
-  display: flex;
-  justify-content: center;
-  padding: 96px 32px 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: start;
+  gap: 24px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px;
 }
 
 .column {
-  width: 100%;
-  max-width: 760px;
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 24px;
 }
 
 .intro {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .title {
-  font-size: 32px;
-  line-height: 40px;
+  font-size: 26px;
+  line-height: 32px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .lede {
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 15px;
+  line-height: 22px;
   color: var(--text-2);
+}
+
+/* Right rail: quick reports and the data behind the answers. */
+.rail {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.railCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--raised);
+}
+
+.railTitle {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.railAction {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--raised);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+}
+
+.railAction:hover {
+  border-color: var(--border-control);
+  background: var(--code-bg);
+}
+
+.railAction span {
+  display: flex;
+  flex-direction: column;
+}
+
+.railAction small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+.railStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0;
+}
+
+.railStats div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.railStats dd {
+  margin: 0;
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 600;
+}
+
+.railStats dt {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.railLink {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+@media (max-width: 1100px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail {
+    position: static;
+  }
 }
 
 .suggestions {
@@ -47,7 +149,7 @@
 .groups {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-  gap: 24px;
+  gap: 16px;
 }
 
 .group {
@@ -123,16 +225,16 @@
 
 @media (max-width: 760px) {
   .page {
-    padding: 24px 16px;
+    padding: 20px 16px;
   }
 
   .column {
-    gap: 24px;
+    gap: 20px;
   }
 
   .title {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: 22px;
+    line-height: 28px;
     letter-spacing: -0.015em;
   }
 
