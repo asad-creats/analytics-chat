@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:portfolio": "tsc -b && vite build --base=/pipeline/ --outDir dist-portfolio --emptyOutDir",
+    "build:portfolio": "tsc -b && vite build --mode portfolio",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "build:pages": "tsc -b && vite build --mode pages"

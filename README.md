@@ -97,10 +97,10 @@ PIPELINE_TEST_DB=postgres://postgres:<password>@localhost:5432/pipeline deno tes
 
 ## Portfolio build
 
-The app also runs at `/pipeline/` on the portfolio site (`asad-creats/projects`). To update it there:
+The same browser demo also runs at `/pipeline/` on the portfolio site (`asad-creats/projects`, deployed on Vercel). To update it there:
 
 ```bash
-VITE_SUPABASE_URL=<url> VITE_SUPABASE_ANON_KEY=<anon key> npm run build:portfolio
+npm run build:portfolio
 ```
 ```bash
 rm -rf ../projects/public/pipeline && cp -r dist-portfolio ../projects/public/pipeline

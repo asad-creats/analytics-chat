@@ -8,9 +8,13 @@ import react from '@vitejs/plugin-react';
  * makes deep links like /analytics-chat/board work. .nojekyll stops Pages
  * from hiding files that start with an underscore.
  */
-function githubPages(outDir: string): Plugin {
+function githubPages(): Plugin {
+  let outDir = 'docs';
   return {
     name: 'github-pages',
+    configResolved(config) {
+      outDir = resolve(config.root, config.build.outDir);
+    },
     closeBundle() {
       copyFileSync(resolve(outDir, 'index.html'), resolve(outDir, '404.html'));
       writeFileSync(resolve(outDir, '.nojekyll'), '');
@@ -19,13 +23,19 @@ function githubPages(outDir: string): Plugin {
 }
 
 export default defineConfig(({ mode }) => {
-  // `vite build --mode pages`: the self-contained demo in docs/, served at
-  // https://asad-creats.github.io/analytics-chat/ (VITE_PIPELINE_MODE comes from .env.pages).
+  // The self-contained browser demo (VITE_PIPELINE_MODE=browser from .env.<mode>), built two ways:
+  // `--mode pages` into docs/ for https://asad-creats.github.io/analytics-chat/, and
+  // `--mode portfolio` into dist-portfolio/ for the portfolio site's /pipeline/.
   const pages = mode === 'pages';
+  const portfolio = mode === 'portfolio';
   return {
-    base: pages ? '/analytics-chat/' : '/',
-    plugins: [react(), ...(pages ? [githubPages('docs')] : [])],
-    build: pages ? { outDir: 'docs', emptyOutDir: true } : {},
+    base: pages ? '/analytics-chat/' : portfolio ? '/pipeline/' : '/',
+    plugins: [react(), ...(pages ? [githubPages()] : [])],
+    build: pages
+      ? { outDir: 'docs', emptyOutDir: true }
+      : portfolio
+        ? { outDir: 'dist-portfolio', emptyOutDir: true }
+        : {},
     // PGlite ships its own WebAssembly; let it load that rather than pre-bundling.
     optimizeDeps: { exclude: ['@electric-sql/pglite'] },
   };
