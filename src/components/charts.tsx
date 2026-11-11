@@ -161,6 +161,8 @@ interface LineChartProps {
   callout?: { series: number; index: number; title: string; detail?: string };
   /** mini only: indexes whose values get printed above the point. */
   labelled?: number[];
+  /** mini only: which series gets those labels (default all), so lines don't overprint. */
+  labelSeries?: number;
 }
 
 // x0..x1 is where the first and last points sit; points spread evenly between.
@@ -180,6 +182,7 @@ export function LineChart({
   focus,
   callout,
   labelled = [],
+  labelSeries,
 }: LineChartProps) {
   const l = layouts[variant];
   const step = categories.length > 1 ? (l.x1 - l.x0) / (categories.length - 1) : 0;
@@ -254,6 +257,7 @@ export function LineChart({
             </text>
           )}
           {variant === 'mini' &&
+            (labelSeries === undefined || labelSeries === si) &&
             labelled.map((i) => (
               <text
                 key={i}

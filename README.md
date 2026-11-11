@@ -2,6 +2,28 @@
 
 AI analytics for real estate teams. Ask about your leads, agents or deals in plain English and get back a number, a chart and a one-line note on what it's based on, worked out from the live CRM data every time you ask.
 
+**Live demo:** <https://asad-creats.github.io/analytics-chat/>
+
+The demo runs entirely in your browser: a real Postgres database (PGlite) seeded with about 420 *generated* leads, 5 months of calls, texts and deals, and a simulated team that keeps logging new leads and calls every minute while you watch. Every name, address and phone number is fake. The six sample questions answer without a key. To ask anything else, add your own Gemini, Claude, OpenAI or OpenRouter key in **AI settings**; it goes straight from your browser to that provider. The first visit loads about 15 MB for the database engine.
+
+![Home](screenshots/home.png)
+
+| An answer | A trend, honest about cause |
+|---|---|
+| ![Lead sources answer](screenshots/answer.png) | ![Response time trend](screenshots/trend.png) |
+
+| Pinned board | AI settings | Mobile (dark) |
+|---|---|---|
+| ![Pinned board](screenshots/board.png) | ![AI settings](screenshots/settings.png) | ![Mobile, dark mode](screenshots/mobile-dark.png) |
+
+## What it does
+
+- **Ask in plain English.** "Which lead sources closed best last quarter?", "Who hasn't called their new leads this week?", "Which contingencies are due this week?"
+- **Get a number, not an essay.** One or two sentences with the key figures, the right chart (bars to compare, columns for days, lines for trends) or a table of names, and what the answer is based on.
+- **Sensible by design.** Answers come only from the data. Vague questions get "which number did you mean?"; out-of-scope ones get "the CRM can't answer that, but here's a related question it can". When the data shows *when* something happened but not *why*, it says so.
+- **Follow-ups in context.** Keep asking in the same conversation ("break that down by agent").
+- **Morning board.** Pin the answers you check every day; Refresh re-runs them on today's data.
+
 ## How it works
 
 ```
@@ -69,6 +91,10 @@ The Edge Function tests run against a real Postgres with the migrations applied.
 PIPELINE_TEST_DB=postgres://postgres:<password>@localhost:5432/pipeline deno test -A --config supabase/functions/pipeline-ask/deno.json supabase/tests/
 ```
 
+## GitHub Pages demo
+
+`npm run build:pages` builds the self-contained demo into `docs/` (served at `/analytics-chat/`). In that build, `VITE_PIPELINE_MODE=browser` (from `.env.pages`) swaps the Supabase backend for one in the browser: PGlite runs the same migrations, the same agent code (`supabase/functions/pipeline-ask/agent.ts`) answers with the visitor's own key, and `src/api/demo/samples.ts` answers the sample questions without AI, from real queries on that data. Commit `docs/` and GitHub Pages serves it (Settings → Pages → Deploy from a branch → `main` / `/docs`).
+
 ## Portfolio build
 
 The app also runs at `/pipeline/` on the portfolio site (`asad-creats/projects`). To update it there:
@@ -87,6 +113,7 @@ Then commit and push `projects`; Vercel redeploys it from `master`.
 - `supabase/migrations/`: schema, read-only query function, quota, demo data and simulator.
 - `supabase/functions/pipeline-ask/`: the Edge Function. `agent.ts` (tool loop and guards), `prompt.ts` (data dictionary and rules), `providers.ts` (Gemini, Claude, OpenAI, OpenRouter), `answer.ts` (answer shape and validation), `index.ts` (HTTP, free tier, own keys).
 - `src/api/pipeline.ts`: the frontend's client for the function.
+- `src/api/demo/`: the GitHub Pages backend (PGlite + the shared agent) and the no-key sample answers.
 - `src/state/`: AI settings, conversations and pins (kept in the browser), toasts.
 - `src/components/`: the design's components. `AnswerView` turns an answer into cards, charts and states.
 - `src/pages/`: Home, Conversation (`/c/:id`), Pinned board, and a States reference page.

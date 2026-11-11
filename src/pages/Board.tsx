@@ -13,6 +13,13 @@ import styles from './Board.module.css';
 /** The big number on a card: the answer's headline, else its top value. */
 function figureFor(answer: Answer): { figure: string; context: string } {
   if (answer.headline) return { figure: answer.headline.value, context: answer.headline.label };
+  if (answer.chart?.type === 'line') {
+    // A trend's headline is its peak.
+    const peak = answer.chart.series
+      .flatMap((s) => s.points.map((p) => ({ ...p, series: s.name })))
+      .reduce((a, b) => (b.value > a.value ? b : a));
+    return { figure: formatValue(peak.value, answer.chart.unit), context: `${peak.series}, ${peak.label}` };
+  }
   const top = answer.chart?.series[0]?.points[0];
   if (top) return { figure: formatValue(top.value, answer.chart?.unit), context: top.label };
   if (answer.table) return { figure: String(answer.table.rows.length), context: answer.table.title ?? answer.title };

@@ -92,7 +92,9 @@ Deno.serve(async (req) => {
     const provider = own.provider as ProviderId;
     if (!PROVIDERS.includes(provider)) return fail("bad_request", "Unknown AI provider.", 400);
     const model = typeof own.model === "string" && own.model.trim() ? own.model.trim() : defaultModels[provider];
-    llm = { provider, apiKey: own.apiKey.trim(), model };
+    // PIPELINE_OPENAI_BASE_URL points the openai provider at any OpenAI-compatible endpoint.
+    const baseUrl = provider === "openai" ? Deno.env.get("PIPELINE_OPENAI_BASE_URL") : undefined;
+    llm = { provider, apiKey: own.apiKey.trim(), model, ...(baseUrl ? { baseUrl } : {}) };
   } else {
     const apiKey = Deno.env.get("GEMINI_API_KEY");
     if (!apiKey) return fail("not_configured", "The free tier isn't set up yet. Add your own key in AI settings.", 503);

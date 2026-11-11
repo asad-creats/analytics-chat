@@ -5,4 +5,6 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL?: string;
   /** Supabase anon (publishable) key. */
   readonly VITE_SUPABASE_ANON_KEY?: string;
+  /** "browser" builds the self-contained GitHub Pages demo. */
+  readonly VITE_PIPELINE_MODE?: string;
 }

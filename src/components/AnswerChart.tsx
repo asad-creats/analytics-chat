@@ -113,6 +113,7 @@ export function ChartBody({ chart, size = 'full' }: AnswerChartProps) {
       ticks={size === 'full' ? ticksFor(max) : []}
       yTitle={size === 'full' && chart.unit ? (chart.unit === '%' ? 'Percent' : chart.unit === 'min' ? 'Minutes' : chart.unit) : undefined}
       labelled={size === 'full' ? [] : [peak.index, points.length - 1]}
+      labelSeries={peak.series}
       callout={
         size === 'full' && chart.series.length > 1
           ? { series: peak.series, index: peak.index, title: formatValue(peak.value, chart.unit) }

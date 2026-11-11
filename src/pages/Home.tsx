@@ -1,14 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import { isConnected } from '../api/pipeline';
+import { browserDemo, isConnected } from '../api/pipeline';
 import { TopBar } from '../components/AppShell';
 import { Composer } from '../components/Composer';
 import { starterGroups } from '../data/starters';
 import { useConversations } from '../state/conversations';
+import { useSettings } from '../state/settings';
 import styles from './Home.module.css';
 
 export function Home() {
   const navigate = useNavigate();
   const { start } = useConversations();
+  const { openSettings } = useSettings();
   const ask = (question: string) => navigate(`/c/${start(question)}`);
 
   return (
@@ -23,6 +25,17 @@ export function Home() {
               every time you ask.
             </p>
           </div>
+
+          {browserDemo && (
+            <p className={styles.demoNote}>
+              This demo runs entirely in your browser: a Postgres database of about 420 sample leads that keeps changing while
+              you watch. The questions below answer without a key; to ask anything, add your own AI key in{' '}
+              <button type="button" className={styles.inlineLink} onClick={openSettings}>
+                AI settings
+              </button>
+              .
+            </p>
+          )}
 
           {!isConnected && (
             <p className={styles.notice}>

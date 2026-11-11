@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { fetchStatus, isConnected, type DataStatus, type OwnKey, type ProviderId } from '../api/pipeline';
+import { browserDemo, fetchStatus, isConnected, type DataStatus, type OwnKey, type ProviderId } from '../api/pipeline';
 import { load, save } from './storage';
 
 export interface AiSettings {
@@ -84,6 +84,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(refreshStatus, [refreshStatus]);
+
+  // The browser demo's simulator adds leads every minute; keep the top bar current.
+  useEffect(() => {
+    if (!browserDemo) return;
+    const timer = window.setInterval(refreshStatus, 60_000);
+    return () => window.clearInterval(timer);
+  }, [refreshStatus]);
 
   const value = useMemo<SettingsValue>(() => {
     const ownKey =

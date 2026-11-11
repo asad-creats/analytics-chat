@@ -38,6 +38,8 @@ function errorCopy(code: string): string {
       return 'The AI service is busy';
     case 'llm_refused':
       return 'The AI declined this one';
+    case 'needs_key':
+      return 'This question needs an AI key';
     case 'not_configured':
       return 'The free demo isn’t set up yet';
     case 'not_connected':
@@ -69,7 +71,7 @@ export function AnswerView({ conversationId, turn }: AnswerViewProps) {
 
   if (turn.status === 'error' || !turn.answer) {
     const code = turn.error?.code ?? 'error';
-    const needsKey = ['daily_limit', 'site_limit', 'not_configured', 'llm_auth'].includes(code);
+    const needsKey = ['daily_limit', 'site_limit', 'not_configured', 'needs_key', 'llm_auth'].includes(code);
     return (
       <ErrorAnswer
         question={turn.question}
@@ -82,7 +84,7 @@ export function AnswerView({ conversationId, turn }: AnswerViewProps) {
             </Button>
             {needsKey && (
               <Button variant="secondary" size="lg" onClick={openSettings}>
-                {code === 'llm_auth' ? 'Check AI settings' : 'Use your own key'}
+                {code === 'llm_auth' ? 'Check AI settings' : 'Add your own key'}
               </Button>
             )}
           </>

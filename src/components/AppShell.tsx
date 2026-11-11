@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
+import { browserDemo } from '../api/pipeline';
 import { currentUser } from '../data/starters';
 import { useConversations } from '../state/conversations';
 import { providers, useSettings } from '../state/settings';
@@ -18,6 +19,7 @@ function useAiLabel() {
     const label = providers.find((p) => p.id === settings.provider)?.label ?? 'own';
     return `Your ${label.replace(/ \(.+\)$/, '').replace('Anthropic', 'Claude')} key`;
   }
+  if (browserDemo) return 'Sample answers (no key)';
   return freeUsage ? `Free demo · ${Math.max(freeUsage.limit - freeUsage.used, 0)} left today` : 'Free demo';
 }
 
@@ -101,7 +103,9 @@ export function AppShell() {
 function LiveFreshness() {
   const { status, statusError } = useSettings();
   if (statusError) return <FreshnessLine state="stale">{statusError}</FreshnessLine>;
-  if (!status) return <FreshnessLine state="refreshing">Connecting to the CRM…</FreshnessLine>;
+  if (!status) {
+    return <FreshnessLine state="refreshing">{browserDemo ? 'Loading the demo database…' : 'Connecting to the CRM…'}</FreshnessLine>;
+  }
 
   const asOf = new Date(status.as_of);
   const sameDay = asOf.toDateString() === new Date().toDateString();

@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { browserDemo } from '../api/pipeline';
 import { useSettings } from '../state/settings';
 import { Icon } from './Icon';
 import styles from './Composer.module.css';
@@ -91,7 +92,7 @@ export function Composer({
           <Icon name="clock" />
           <span>
             {status
-              ? `Live CRM data · ${status.lead_count.toLocaleString()} leads · updates every 15 minutes`
+              ? `Live CRM data · ${status.lead_count.toLocaleString()} leads · updates every ${browserDemo ? 'minute' : '15 minutes'}`
               : 'Answers come from live CRM data'}
           </span>
         </div>

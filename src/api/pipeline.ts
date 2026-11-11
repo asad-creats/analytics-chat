@@ -27,7 +27,8 @@ export interface Answer {
 
 export interface AnswerMeta {
   as_of: string | null;
-  mode: 'free' | 'own';
+  /** sample: the browser demo's no-key answers. */
+  mode: 'free' | 'own' | 'sample';
   provider: string;
   model: string;
   usage?: { used: number; limit: number };
@@ -63,14 +64,21 @@ export class AskError extends Error {
 
   /** Errors that adding your own key fixes. */
   get needsOwnKey() {
-    return ['daily_limit', 'site_limit', 'not_configured'].includes(this.code);
+    return ['daily_limit', 'site_limit', 'not_configured', 'needs_key'].includes(this.code);
   }
 }
 
 const baseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-export const isConnected = Boolean(baseUrl);
+/**
+ * The GitHub Pages build runs everything in the browser (Postgres via PGlite,
+ * the visitor's own AI key). Loaded on demand so the server build stays small.
+ */
+export const browserDemo = import.meta.env.VITE_PIPELINE_MODE === 'browser';
+const demo = () => import('./demo/browser');
+
+export const isConnected = browserDemo || Boolean(baseUrl);
 
 async function call<T>(body: unknown): Promise<T> {
   if (!baseUrl) {
@@ -102,10 +110,12 @@ export interface HistoryTurn {
   summary: string;
 }
 
-export function ask(question: string, history: HistoryTurn[], ownKey?: OwnKey) {
+export async function ask(question: string, history: HistoryTurn[], ownKey?: OwnKey) {
+  if (browserDemo) return (await demo()).ask(question, history, ownKey);
   return call<{ answer: Answer; meta: AnswerMeta }>({ question, history, llm: ownKey });
 }
 
-export function fetchStatus() {
+export async function fetchStatus() {
+  if (browserDemo) return (await demo()).status();
   return call<DataStatus>({ action: 'status' });
 }

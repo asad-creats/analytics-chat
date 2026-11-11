@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { browserDemo } from '../api/pipeline';
 import { providers, useSettings, type AiSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 import { Button } from './controls';
@@ -52,9 +53,11 @@ export function AiSettingsDialog() {
           <label className={`${styles.mode} ${draft.mode === 'free' ? styles.modeOn : ''}`}>
             <input type="radio" name="mode" checked={draft.mode === 'free'} onChange={() => set({ mode: 'free' })} />
             <span className={styles.modeText}>
-              <strong>Free demo</strong>
+              <strong>{browserDemo ? 'Sample answers' : 'Free demo'}</strong>
               <span>
-                {status && !status.free_tier
+                {browserDemo
+                  ? 'No key needed. Answers the sample questions on the home page.'
+                  : status && !status.free_tier
                   ? 'Not set up on this site yet.'
                   : freeLimit
                     ? `${freeLeft} of ${freeLimit} free questions left today.`
@@ -66,7 +69,9 @@ export function AiSettingsDialog() {
             <input type="radio" name="mode" checked={draft.mode === 'own'} onChange={() => set({ mode: 'own' })} />
             <span className={styles.modeText}>
               <strong>Your own key</strong>
-              <span>No daily limit. Use Gemini, Claude, OpenAI or OpenRouter.</span>
+              <span>
+                {browserDemo ? 'Ask anything.' : 'No daily limit.'} Use Gemini, Claude, OpenAI or OpenRouter.
+              </span>
             </span>
           </label>
         </fieldset>
@@ -118,8 +123,9 @@ export function AiSettingsDialog() {
               </datalist>
             </div>
             <p className={styles.privacy}>
-              Your key is saved only in this browser. It’s sent with each question to run that one answer and is never
-              stored on the server.
+              {browserDemo
+                ? `Your key is saved only in this browser and goes straight from it to ${provider.label}. This demo has no server.`
+                : 'Your key is saved only in this browser. It’s sent with each question to run that one answer and is never stored on the server.'}
             </p>
           </div>
         )}

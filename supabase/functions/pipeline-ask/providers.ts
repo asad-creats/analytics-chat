@@ -10,6 +10,10 @@ export interface LlmConfig {
   provider: ProviderId;
   apiKey: string;
   model: string;
+  /** For openai: any OpenAI-compatible endpoint instead of api.openai.com. */
+  baseUrl?: string;
+  /** Running in the visitor's browser with their own key (the GitHub Pages demo). */
+  browser?: boolean;
 }
 
 export const defaultModels: Record<ProviderId, string> = {
@@ -75,7 +79,13 @@ function parseArgs(raw: unknown): Record<string, unknown> {
 const FALLBACK_MODELS = new Set(["claude-fable-5-1", "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5-5"]);
 
 const anthropicLoop: LoopRunner = async (cfg, system, user, tools, handle, maxSteps) => {
-  const client = new Anthropic({ apiKey: cfg.apiKey, timeout: TIMEOUT_MS, maxRetries: 1 });
+  const client = new Anthropic({
+    apiKey: cfg.apiKey,
+    timeout: TIMEOUT_MS,
+    maxRetries: 1,
+    // Only ever the visitor's own key, sent from their own browser.
+    dangerouslyAllowBrowser: cfg.browser,
+  });
   const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: user }];
   const anthropicTools = tools.map((t) => ({
     name: t.name,
@@ -196,8 +206,9 @@ const geminiLoop: LoopRunner = async (cfg, system, user, tools, handle, maxSteps
 
 /* ---------------- OpenAI and OpenRouter (chat completions) ---------------- */
 
-function chatCompletionsLoop(baseUrl: string, label: string, extraHeaders: Record<string, string> = {}): LoopRunner {
+function chatCompletionsLoop(defaultBaseUrl: string, label: string, extraHeaders: Record<string, string> = {}): LoopRunner {
   return async (cfg, system, user, tools, handle, maxSteps) => {
+    const baseUrl = cfg.baseUrl ?? defaultBaseUrl;
     const messages: Record<string, unknown>[] = [
       { role: "system", content: system },
       { role: "user", content: user },
@@ -248,8 +259,7 @@ function chatCompletionsLoop(baseUrl: string, label: string, extraHeaders: Recor
 export const loops: Record<ProviderId, LoopRunner> = {
   anthropic: anthropicLoop,
   gemini: geminiLoop,
-  // Override for any OpenAI-compatible endpoint (and for local testing).
-  openai: chatCompletionsLoop(Deno.env.get("PIPELINE_OPENAI_BASE_URL") ?? "https://api.openai.com/v1", "OpenAI"),
+  openai: chatCompletionsLoop("https://api.openai.com/v1", "OpenAI"),
   openrouter: chatCompletionsLoop("https://openrouter.ai/api/v1", "OpenRouter", {
     "HTTP-Referer": "https://projects-zeta-pied.vercel.app/pipeline/",
     "X-Title": "Pipeline",
